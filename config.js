@@ -2,7 +2,7 @@
 const GOOGLE_MAPS_API_KEY = "AIzaSyBpArhA1azKFUtD2rfC0hUZ4Brk36T9KtU";
 
 // 📊 GOOGLE ANALYTICS - Replace 'G-XXXXXXXXXX' with your GA4 Measurement ID
-const GOOGLE_ANALYTICS_ID = "G-XXXXXXXXXX";
+const GOOGLE_ANALYTICS_ID = "G-P4708B9FM5";
 
 // Google Analytics helper functions
 function trackEvent(eventName, eventParams = {}) {
