@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indian Highway Route Analyzer - Premium</title>
+    <link rel="stylesheet" href="styles.css" />
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      
+      // Replace 'G-XXXXXXXXXX' with your actual Google Analytics Measurement ID
+      gtag('config', 'G-XXXXXXXXXX', {
+        'page_path': window.location.pathname
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🛣️ Indian Highway Route Analyzer - Premium</h1>
+        <p>
+          Advanced route analysis with history, favorites, cost calculator &
+          more
+        </p>
+      </header>
+
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="analyzer">Analyzer</button>
+        <button class="nav-tab" data-tab="history">📋 History</button>
+        <button class="nav-tab" data-tab="favorites">⭐ Favorites</button>
+        <button class="nav-tab" data-tab="calculator">
+          💰 Cost Calculator
+        </button>
+        <button class="nav-tab" data-tab="settings">⚙️ Settings</button>
+      </div>
+
+      <!-- TAB 1: Route Analyzer -->
+      <div id="analyzer" class="tab-content active">
+        <div class="input-section">
+          <div class="input-group">
+            <label for="origin">Starting Point:</label>
+            <div class="autocomplete-wrapper">
+              <input
+                type="text"
+                id="origin"
+                placeholder="e.g., Hyderabad, Telangana"
+                value="Hyderabad, Telangana"
+                autocomplete="off"
+              />
+              <ul id="originSuggestions" class="autocomplete-list hidden"></ul>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="destination">Destination:</label>
+            <div class="autocomplete-wrapper">
+              <input
+                type="text"
+                id="destination"
+                placeholder="e.g., Tirumala Railway Station, Andhra Pradesh"
+                value="Tirumala Railway Station, Andhra Pradesh"
+                autocomplete="off"
+              />
+              <ul
+                id="destinationSuggestions"
+                class="autocomplete-list hidden"
+              ></ul>
+            </div>
+          </div>
+
+          <div class="input-group transport-mode-group">
+            <label>Transport Mode:</label>
+            <div class="transport-buttons">
+              <button
+                class="transport-btn active"
+                data-mode="DRIVING"
+                title="Car"
+              >
+                🚗 Car
+              </button>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button id="analyzeBtn" class="btn-primary">Analyze Route</button>
+            <button id="liveLocationBtn" class="btn-secondary">
+              📍 My Location
+            </button>
+            <button id="saveFavoriteBtn" class="btn-secondary hidden">
+              ⭐ Save Favorite
+            </button>
+          </div>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="advanced-options">
+          <label>
+            <input type="checkbox" id="showWeather" /> 🌤️ Show Weather
+          </label>
+        </div>
+
+        <div id="loading" class="loading hidden">
+          <div class="spinner"></div>
+          <p>Analyzing route...</p>
+        </div>
+
+        <div id="results" class="results hidden">
+          <div class="summary-card">
+            <h2>Route Summary</h2>
+            <div class="summary-grid">
+              <div class="stat">
+                <span class="label">Total Distance</span>
+                <span class="value" id="totalDistance">-</span>
+              </div>
+              <div class="stat">
+                <span class="label">Estimated Time</span>
+                <span class="value" id="estimatedTime">-</span>
+              </div>
+              <div class="stat">
+                <span class="label">Routes Available</span>
+                <span class="value" id="routeCount">-</span>
+              </div>
+              <div class="stat">
+                <span class="label">Estimated Cost</span>
+                <span class="value" id="estimatedCost">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather Display -->
+          <div id="weatherSection" class="weather-section hidden">
+            <h2>🌤️ Weather Forecast</h2>
+            <div id="weatherInfo" class="weather-info"></div>
+          </div>
+
+          <div class="routes-section">
+            <h2>Available Routes</h2>
+            <div id="routesList" class="routes-list"></div>
+          </div>
+
+          <div class="highways-breakdown">
+            <h2>Highway Breakdown</h2>
+            <div id="highwaysList" class="highways-list"></div>
+          </div>
+
+          <div class="map-container">
+            <h2>Route Map</h2>
+            <div id="map"></div>
+          </div>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+        <div id="successMsg" class="success-msg hidden"></div>
+      </div>
+
+      <!-- TAB 2: Route History -->
+      <div id="history" class="tab-content">
+        <div class="tab-header">
+          <h2>📋 Recent Routes</h2>
+          <button id="clearHistoryBtn" class="btn-danger">Clear History</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </div>
+
+      <!-- TAB 3: Favorite Routes -->
+      <div id="favorites" class="tab-content">
+        <div class="tab-header">
+          <h2>⭐ Saved Favorite Routes</h2>
+          <button id="clearFavoritesBtn" class="btn-danger">Clear All</button>
+        </div>
+        <div id="favoritesList" class="favorites-list"></div>
+      </div>
+
+      <!-- TAB 4: Cost Calculator -->
+      <div id="calculator" class="tab-content">
+        <div class="calculator-section">
+          <h2>💰 Route Cost Calculator</h2>
+
+          <div class="calc-input-group">
+            <label>Vehicle Type:</label>
+            <select id="vehicleType">
+              <option value="car">🚗 Car (Petrol)</option>
+              <option value="carDiesel">🚗 Car (Diesel)</option>
+              <option value="bike">🏍️ Bike</option>
+              <option value="truck">🚚 Truck</option>
+            </select>
+          </div>
+
+          <div class="calc-input-group">
+            <label>Fuel Price (₹/liter):</label>
+            <input
+              type="number"
+              id="fuelPrice"
+              value="100"
+              min="0"
+              step="0.5"
+            />
+          </div>
+
+          <div class="calc-input-group">
+            <label>Mileage (km/liter):</label>
+            <input type="number" id="mileage" value="15" min="1" step="0.1" />
+          </div>
+
+          <div class="calc-input-group">
+            <label>Toll Estimate (₹):</label>
+            <input type="number" id="tollCost" value="0" min="0" step="10" />
+          </div>
+
+          <button id="calculateBtn" class="btn-primary">Calculate Cost</button>
+
+          <div id="costResults" class="cost-results hidden">
+            <div class="cost-item">
+              <span>Fuel Cost:</span>
+              <span id="fuelCostResult">-</span>
+            </div>
+            <div class="cost-item">
+              <span>Toll Charges:</span>
+              <span id="tollCostResult">-</span>
+            </div>
+            <div class="cost-item total">
+              <span>Total Cost:</span>
+              <span id="totalCostResult">-</span>
+            </div>
+            <div class="cost-item">
+              <span>Cost per km:</span>
+              <span id="costPerKmResult">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Settings -->
+      <div id="settings" class="tab-content">
+        <div class="settings-section">
+          <h2>⚙️ Settings & Preferences</h2>
+
+          <div class="settings-group">
+            <h3>Display Settings</h3>
+            <label>
+              <input type="checkbox" id="darkMode" /> 🌙 Dark Mode
+            </label>
+            <label>
+              <input type="checkbox" id="autoSaveRoute" /> 💾 Auto-save Routes
+              to History
+            </label>
+          </div>
+
+          <div class="settings-group">
+            <h3>Default Values</h3>
+            <label>
+              Default Vehicle:
+              <select id="defaultVehicle">
+                <option value="car">Car</option>
+                <option value="bike">Bike</option>
+              </select>
+            </label>
+            <label>
+              Default Fuel Price (₹):
+              <input
+                type="number"
+                id="defaultFuelPrice"
+                value="100"
+                min="0"
+                step="0.5"
+              />
+            </label>
+          </div>
+
+          <!-- <div class="settings-group">
+            <h3>Data Management</h3>
+            <button id="exportDataBtn" class="btn-secondary">
+              📥 Export Data
+            </button>
+            <button id="importDataBtn" class="btn-secondary">
+              📤 Import Data
+            </button>
+            <button id="resetSettingsBtn" class="btn-danger">
+              🔄 Reset All Settings
+            </button>
+          </div> -->
+
+          <!-- <div class="settings-group">
+            <h3>About</h3>
+            <p>Indian Highway Route Analyzer - Premium Edition v3.0</p>
+            <p>
+              With advanced features: History, Favorites, Cost Calculator,
+              Weather & Traffic
+            </p>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
