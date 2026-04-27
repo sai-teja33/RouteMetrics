@@ -312,7 +312,7 @@ async function analyzeRoute() {
     // Get weather info
     if (document.getElementById("showWeather").checked) {
       getWeatherInfo(origin, destination);
-      trackEvent('weather_checked');
+      trackEvent("weather_checked");
     }
 
     // Save to history if enabled
@@ -321,12 +321,14 @@ async function analyzeRoute() {
     }
 
     // Track successful route analysis
-    const totalDistance = result.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0) / 1000;
-    trackEvent('route_analyzed', {
-      'origin': origin.split(',')[0],
-      'destination': destination.split(',')[0],
-      'distance_km': Math.round(totalDistance),
-      'route_count': result.routes.length
+    const totalDistance =
+      result.routes[0].legs.reduce((sum, leg) => sum + leg.distance.value, 0) /
+      1000;
+    trackEvent("route_analyzed", {
+      origin: origin.split(",")[0],
+      destination: destination.split(",")[0],
+      distance_km: Math.round(totalDistance),
+      route_count: result.routes.length,
     });
 
     showLoading(false);
@@ -336,10 +338,10 @@ async function analyzeRoute() {
     console.error("Error analyzing route:", error);
     showError("Error: " + error.message);
     showLoading(false);
-    
+
     // Track route analysis error
-    trackEvent('route_analysis_error', {
-      'error_message': error.message
+    trackEvent("route_analysis_error", {
+      error_message: error.message,
     });
   }
 }
@@ -604,22 +606,21 @@ function analyzeRouteDetails(route) {
         ...(stepName.match(highwayPattern) || []),
       ];
 
-      if (matches.length) {
-        matches.forEach((highway) => {
-          const cleanName = highway.toUpperCase().replace(/\s+/g, " ").trim();
+      if (matches.length > 0) {
+        const highway = matches[0];
+        const cleanName = highway.toUpperCase().replace(/\s+/g, " ").trim();
 
-          if (!highways[cleanName]) {
-            highways[cleanName] = {
-              name: cleanName,
-              distance: 0,
-              lanes: "4-lane",
-              direction: "Two-way",
-              steps: [],
-            };
-          }
+        if (!highways[cleanName]) {
+          highways[cleanName] = {
+            name: cleanName,
+            distance: 0,
+            lanes: "4-lane",
+            direction: "Two-way",
+            steps: [],
+          };
+        }
 
-          highways[cleanName].distance += step.distance.value / 1000;
-        });
+        highways[cleanName].distance += step.distance.value / 1000;
       }
     });
   });
@@ -741,13 +742,13 @@ function saveFavorite() {
   favorites.unshift(favorite);
   localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
   showSuccess("⭐ Route saved to favorites!");
-  
+
   // Track favorite saved
-  trackEvent('favorite_saved', {
-    'origin': origin.split(',')[0],
-    'destination': destination.split(',')[0]
+  trackEvent("favorite_saved", {
+    origin: origin.split(",")[0],
+    destination: destination.split(",")[0],
   });
-  
+
   loadFavorites();
 }
 
@@ -805,10 +806,10 @@ function calculateCost() {
   const costPerKm = distance > 0 ? totalCost / distance : 0;
 
   // Track cost calculation
-  trackEvent('cost_calculated', {
-    'vehicle_type': vehicleType,
-    'distance_km': Math.round(distance),
-    'total_cost_inr': Math.round(totalCost)
+  trackEvent("cost_calculated", {
+    vehicle_type: vehicleType,
+    distance_km: Math.round(distance),
+    total_cost_inr: Math.round(totalCost),
   });
 
   document.getElementById("fuelCostResult").textContent =
@@ -884,10 +885,10 @@ function saveSettings() {
   }
 
   // Track settings changes
-  trackEvent('settings_updated', {
-    'dark_mode': appSettings.darkMode,
-    'auto_save_route': appSettings.autoSaveRoute,
-    'default_vehicle': appSettings.defaultVehicle
+  trackEvent("settings_updated", {
+    dark_mode: appSettings.darkMode,
+    auto_save_route: appSettings.autoSaveRoute,
+    default_vehicle: appSettings.defaultVehicle,
   });
 
   showSuccess("✓ Settings saved!");
